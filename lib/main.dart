@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '纸牌游戏',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -33,7 +34,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<List<Poker>> status;
+  List<List<List<Poker>>> status = [];
+  List<List<List<Poker>>> regretList = [];
   List<Poker> allPokers;
   List<PokerHeap> topHeapList;
   List<PokerHeap> tableHeapList;
@@ -54,6 +56,24 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
+          IconButton(
+              onPressed: status.isNotEmpty
+                  ? () {
+                      setState(() {
+                        regret();
+                      });
+                    }
+                  : null,
+              icon: Icon(Icons.arrow_back)),
+          // IconButton(
+          //     onPressed: regretList.isNotEmpty
+          //         ? () {
+          //             setState(() {
+          //               forward();
+          //             });
+          //           }
+          //         : null,
+          //     icon: Icon(Icons.arrow_forward)),
           TextButton(
               onPressed: () {
                 setState(() {
@@ -88,6 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: DeckPile(
                     heap: deckHeap,
                     onClick: (Poker poker) {
+                      copyStatus();
                       if (poker == null) {
                         deckHeap.pokers.addAll(disHeap.pokers.reversed);
                         disHeap.pokers.removeWhere((_) => true);
@@ -115,7 +136,15 @@ class _MyHomePageState extends State<MyHomePage> {
               ]..addAll(topHeapList
                   .map((heap) => SuitPile(
                         heap: heap,
+                        onDragEnd: (detail){
+                          if (detail.wasAccepted){
+                            setState(() {
+                              heap.removeLast();
+                            });
+                          }
+                        },
                         onAccept: (Poker poker) {
+                          copyStatus();
                           setState(() {
                             heap.put(poker);
                           });
@@ -166,6 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             }
                           },
                           onAccept: (Poker poker) {
+                            copyStatus();
                             setState(() {
                               e.put(poker);
                             });
@@ -183,6 +213,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void start(Random random) {
+    status = [];
+    regretList = [];
     if (allPokers == null) {
       allPokers = Poker.allPoker();
       allPokers.shuffle(random);
@@ -218,6 +250,65 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       deckHeap.pokers.clear();
       deckHeap.pokers.addAll(allPokers.sublist(28));
+    }
+  }
+
+  void copyStatus() {
+    List<List<Poker>> singleState = [];
+    singleState.add(allPokers);
+    topHeapList?.forEach((element) {
+      singleState.add(List.of(element.pokers));
+    });
+    tableHeapList?.forEach((element) {
+      singleState.add(List.of(element.pokers));
+    });
+    singleState.add(List.of(disHeap.pokers));
+    singleState.add(List.of(deckHeap.pokers));
+    status.add(singleState);
+  }
+
+  void regret() {
+    if (status.isNotEmpty) {
+      int point = 0;
+      List<List<Poker>> pokerStatus = status.removeLast();
+      allPokers.clear();
+      allPokers.addAll(pokerStatus[point++]);
+      topHeapList.forEach((element) {
+        element.pokers.clear();
+        element.pokers.addAll(pokerStatus[point++]);
+      });
+      tableHeapList?.forEach((element) {
+        element.pokers.clear();
+        element.pokers.addAll(pokerStatus[point++]);
+      });
+      disHeap.pokers.clear();
+      disHeap.pokers.addAll(pokerStatus[point++]);
+      deckHeap.pokers.clear();
+      deckHeap.pokers.addAll(pokerStatus[point++]);
+      regretList.add(pokerStatus);
+    }
+  }
+
+  void forward() {
+    if (regretList.isNotEmpty) {
+      int point = 0;
+      List<List<Poker>> pokerStatus = regretList.removeLast();
+      allPokers.clear();
+      allPokers.addAll(pokerStatus[point++]);
+      topHeapList.forEach((element) {
+        element.pokers.clear();
+        element.pokers.addAll(pokerStatus[point++]);
+      });
+      tableHeapList?.forEach((element) {
+        element.pokers.clear();
+        element.pokers.addAll(pokerStatus[point++]);
+      });
+      disHeap.pokers.clear();
+      disHeap.pokers.addAll(pokerStatus[point++]);
+      deckHeap.pokers.clear();
+      deckHeap.pokers.addAll(pokerStatus[point++]);
+      regretList.add(pokerStatus);
+      status.add(pokerStatus);
     }
   }
 }

@@ -33,6 +33,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List<List<Poker>> status;
   List<Poker> allPokers;
   List<PokerHeap> topHeapList;
   List<PokerHeap> tableHeapList;
@@ -111,38 +112,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 Expanded(child: Container()),
-                // SuitPile(
-                //   heap: topHeapList[0],
-                //   onAccept: (Poker poker) {
-                //     setState(() {
-                //       topHeapList[0].put(poker);
-                //     });
-                //   },
-                // ),
-                // SuitPile(
-                //   heap: topHeapList[1],
-                //   onAccept: (Poker poker) {
-                //     setState(() {
-                //       topHeapList[1].put(poker);
-                //     });
-                //   },
-                // ),
-                // SuitPile(
-                //   heap: topHeapList[2],
-                //   onAccept: (Poker poker) {
-                //     setState(() {
-                //       topHeapList[2].put(poker);
-                //     });
-                //   },
-                // ),
-                // SuitPile(
-                //   heap: topHeapList[3],
-                //   onAccept: (Poker poker) {
-                //     setState(() {
-                //       topHeapList[3].put(poker);
-                //     });
-                //   },
-                // ),
               ]..addAll(topHeapList
                   .map((heap) => SuitPile(
                         heap: heap,

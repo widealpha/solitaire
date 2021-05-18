@@ -38,7 +38,7 @@ class _PokerCardState extends State<PokerCard> {
           });
         }
       },
-      child: Draggable(
+      child: _poker?.isOpen ?? true ? Draggable(
         child: _poker != null
             ? Container(
                 width: 64,
@@ -67,6 +67,11 @@ class _PokerCardState extends State<PokerCard> {
             widget.onDragEnd(detail);
           }
         },
+      ) : Container(
+        width: 64,
+        height: 100,
+        decoration: BoxDecoration(
+            image: DecorationImage(image: _poker.getImage())),
       ),
     );
   }

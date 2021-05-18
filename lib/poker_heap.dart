@@ -69,7 +69,7 @@ class TableHeap extends PokerHeap {
   bool canPut(Poker poker) {
     if (pokers.isEmpty && poker.point == 13) {
       return true;
-    } else if (pokers.last.point == poker.point &&
+    } else if (pokers.last.point == poker.point + 1 &&
         pokers.last.suit + poker.suit != 3) {
       //不等于3就是花色颜色不同
       return true;

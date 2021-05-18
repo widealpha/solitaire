@@ -92,8 +92,10 @@ class _PokerCardState extends State<PokerCard> {
 class SuitPile extends StatefulWidget {
   final PokerHeap heap;
   final void Function(Poker) onAccept;
+  final void Function(DraggableDetails details) onDragEnd;
 
-  const SuitPile({Key key, this.heap, this.onAccept}) : super(key: key);
+  const SuitPile({Key key, this.heap, this.onAccept, this.onDragEnd})
+      : super(key: key);
 
   @override
   _SuitPileState createState() => _SuitPileState();
@@ -122,6 +124,7 @@ class _SuitPileState extends State<SuitPile> {
                 : PokerCard(
                     poker: _heap.pokers.last,
                     heap: widget.heap,
+                    onDragEnd: widget.onDragEnd,
                   ),
           ),
         );
@@ -146,8 +149,8 @@ class DeskPile extends StatefulWidget {
   final void Function(DraggableDetails details) onDragEnd;
   final void Function(Poker) onAccept;
 
-
-  const DeskPile({Key key, this.heap, this.onDragEnd, this.onAccept}) : super(key: key);
+  const DeskPile({Key key, this.heap, this.onDragEnd, this.onAccept})
+      : super(key: key);
 
   @override
   _DeskPileState createState() => _DeskPileState();
@@ -164,20 +167,42 @@ class _DeskPileState extends State<DeskPile> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: _heap.pokers.asMap().entries.map((e) {
-        return Positioned(
-          top: 20.0 * e.key,
-          child: PokerCard(
-            poker: e.value,
-            onDragEnd: (detail) {
-              if (widget.onDragEnd != null) {
-                widget.onDragEnd(detail);
-              }
-            },
-          ),
+    return DragTarget(
+      builder: (_, __, ___) {
+        return Stack(
+          children: _heap.pokers.asMap().entries.map((e) {
+            return Positioned(
+              top: 20.0 * e.key,
+              child: PokerCard(
+                poker: e.value,
+                onDragEnd: (detail) {
+                  if (widget.onDragEnd != null) {
+                    widget.onDragEnd(detail);
+                  }
+                },
+              ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
+      onAccept: (data) {
+        if (data is Poker) {
+          if (widget.onAccept != null) {
+            widget.onAccept(data);
+          }
+        }
+      },
+      onWillAccept: (data) {
+        if (data is Poker) {
+          if (!_heap.pokers.contains(data)) {
+            return _heap.canPut(data);
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      },
     );
   }
 }

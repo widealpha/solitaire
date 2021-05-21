@@ -41,12 +41,13 @@ class _MyHomePageState extends State<MyHomePage> {
   List<PokerHeap> tableHeapList;
   DisHeap disHeap;
   DeckHeap deckHeap;
-  int seed;
+  int seed = 0;
 
   @override
   void initState() {
     super.initState();
     seed = Random().nextInt(23456789);
+    // cheat();
     start(Random(seed));
   }
 
@@ -95,6 +96,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 '重新开始游戏',
                 style: TextStyle(color: Colors.white),
               )),
+          TextButton(onPressed: (){
+            setState(() {
+              cheat();
+            });
+          }, child: Text('作弊模式'))
         ],
       ),
       body: Container(
@@ -136,8 +142,8 @@ class _MyHomePageState extends State<MyHomePage> {
               ]..addAll(topHeapList
                   .map((heap) => SuitPile(
                         heap: heap,
-                        onDragEnd: (detail){
-                          if (detail.wasAccepted){
+                        onDragEnd: (detail) {
+                          if (detail.wasAccepted) {
                             setState(() {
                               heap.removeLast();
                             });
@@ -152,25 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           topHeapList
                               .forEach((heap) => count += heap.pokers.length);
                           if (count == 52) {
-                            showDialog(
-                                context: context,
-                                barrierDismissible: true,
-                                builder: (_) => AlertDialog(
-                                      title: Text('恭喜您获胜了'),
-                                      actions: [
-                                        TextButton(
-                                            onPressed: () {
-                                              exit(0);
-                                            },
-                                            child: Text('退出')),
-                                        TextButton(
-                                            onPressed: () {
-                                              seed = Random().nextInt(1234556);
-                                              start(Random(seed));
-                                            },
-                                            child: Text('再来一局')),
-                                      ],
-                                    ));
+                            showWin();
                           }
                         },
                       ))
@@ -210,6 +198,30 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  void cheat() {
+    status = [];
+    regretList = [];
+    allPokers = Poker.allPoker();
+    allPokers.forEach((poker) => poker.isOpen = false);
+    disHeap.pokers.clear();
+    topHeapList.forEach((heap) {
+      heap.pokers.clear();
+    });
+    tableHeapList.forEach((heap) {
+      heap.pokers.clear();
+    });
+
+    for (int i = 0; i < 7; i++) {
+      tableHeapList[i].pokers.clear();
+      int start = i * (i + 1) ~/ 2;
+      int end = (i + 1) * (i + 2) ~/ 2;
+      tableHeapList[i].pokers.addAll(allPokers.sublist(start, end).reversed.toList());
+      tableHeapList[i].topPoker().isOpen = true;
+    }
+    deckHeap.pokers.clear();
+    deckHeap.pokers.addAll(allPokers.sublist(28).reversed.toList());
   }
 
   void start(Random random) {
@@ -310,5 +322,29 @@ class _MyHomePageState extends State<MyHomePage> {
       regretList.add(pokerStatus);
       status.add(pokerStatus);
     }
+  }
+
+  void showWin() {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (_) => AlertDialog(
+              title: Text('恭喜您获胜了'),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      exit(0);
+                    },
+                    child: Text('退出')),
+                TextButton(
+                    onPressed: () {
+                      setState(() {
+                        seed = Random().nextInt(1234556);
+                        start(Random(seed));
+                      });
+                    },
+                    child: Text('再来一局')),
+              ],
+            ));
   }
 }

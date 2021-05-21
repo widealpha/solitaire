@@ -36,9 +36,11 @@ abstract class PokerHeap {
   }
 
   List<Poker> removeAfter(int index) {
+
     if (canRemoveAfter(index)) {
-      pokers.removeRange(index - 1, pokers.length);
-      return pokers.sublist(index - 1);
+      List<Poker> back = pokers.sublist(index);
+      pokers.removeRange(index, pokers.length);
+      return back;
     } else {
       return [];
     }

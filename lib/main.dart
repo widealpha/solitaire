@@ -46,8 +46,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    seed = Random().nextInt(23456789);
+    // seed = Random().nextInt(23456789);
     // cheat();
+    seed = 73218716321;
     start(Random(seed));
   }
 
@@ -190,7 +191,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             copyStatus();
                             setState(() {
                               List<Poker> as = afterPokers(poker);
-                              if (as.length == 0){
+                              if (as == null || as.length == 0) {
                                 e.put(poker);
                               } else {
                                 e.putList(as);
@@ -358,6 +359,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Text('退出')),
                 TextButton(
                     onPressed: () {
+                      Navigator.of(context).pop();
                       setState(() {
                         seed = Random().nextInt(1234556);
                         start(Random(seed));

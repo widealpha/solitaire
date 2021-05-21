@@ -151,7 +151,7 @@ class _SuitPileState extends State<SuitPile> {
 
 class DeskPile extends StatefulWidget {
   final PokerHeap heap;
-  final void Function(DraggableDetails details) onDragEnd;
+  final void Function(DraggableDetails details, Poker poker) onDragEnd;
   final void Function(Poker) onAccept;
 
   const DeskPile({Key key, this.heap, this.onDragEnd, this.onAccept})
@@ -182,7 +182,7 @@ class _DeskPileState extends State<DeskPile> {
                 poker: e.value,
                 onDragEnd: (detail) {
                   if (widget.onDragEnd != null) {
-                    widget.onDragEnd(detail);
+                    widget.onDragEnd(detail, e.value);
                   }
                 },
               ),

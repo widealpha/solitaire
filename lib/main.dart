@@ -174,10 +174,14 @@ class _MyHomePageState extends State<MyHomePage> {
                         padding: EdgeInsets.all(12),
                         child: DeskPile(
                           heap: e,
-                          onDragEnd: (detail) {
+                          onDragEnd: (detail, poker) {
                             if (detail.wasAccepted) {
                               setState(() {
-                                e.removeLast();
+                                if (poker == e.topPoker()){
+                                  e.removeLast();
+                                } else {
+                                  e.removeAfter(e.pokers.indexOf(poker));
+                                }
                                 e.topPoker()?.isOpen = true;
                               });
                             }
@@ -185,7 +189,12 @@ class _MyHomePageState extends State<MyHomePage> {
                           onAccept: (Poker poker) {
                             copyStatus();
                             setState(() {
-                              e.put(poker);
+                              List<Poker> as = afterPokers(poker);
+                              if (as.length == 0){
+                                e.put(poker);
+                              } else {
+                                e.putList(as);
+                              }
                             });
                           },
                         ),
@@ -198,6 +207,17 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  List<Poker> afterPokers(Poker poker){
+    List l;
+    tableHeapList.forEach((element) {
+      if (element.pokers.contains(poker)){
+        int index = element.pokers.indexOf(poker);
+        l = element.pokers.sublist(index);
+      }
+    });
+    return l;
   }
 
   void cheat() {

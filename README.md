@@ -1,6 +1,6 @@
 # solitaire
 
-A solitaire game.
+山东大学软件学院面向对象solitaire game.这个项目采用flutter框架制作，语言使用dart语言。对于flutter框架下面readme有介绍。已经release的版本在window10上是可以直接运行的。
 
 ## Getting Started
 
